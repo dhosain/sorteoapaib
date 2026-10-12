@@ -33,15 +33,15 @@ En el celular, conectado al mismo Wi-Fi, abrir `http://DIRECCION-DE-LA-COMPUTADO
 3. Confirmar presencia para guardar el finalista. Si está ausente, excluirlo y repetir. Los ausentes se excluyen durante toda la partida. No confirmar un ausente.
 4. Al alcanzar diez finalistas, preparar la final. Se asignan al azar cinco aperturas y cinco premios consuelo, una sola vez. Los premios principales son TV 55 pulgadas, robot aspiradora, parlante y dos smart watches.
 5. Puede acercarse cualquier finalista pendiente. Seleccionar su número y probar su llave. Esperar la animación y entregar el premio; luego continuar. No avanzar mientras la animación esté en curso.
-6. Al finalizar aparecen los resultados. Reiniciar requiere escribir REINICIAR. Para ensayar, usar una partida separada y reiniciar antes del evento.
+6. Al finalizar aparecen los resultados. Para reiniciar, abrir Administración, pulsar Reiniciar partida y confirmar en la ventana con botones Cancelar / Reiniciar partida. Para ensayar, usar una partida separada y reiniciar antes del evento.
 
 Los datos se guardan en `.data/game.json` después de cada acción. Al reiniciar el servidor la partida continúa y el código local cambia si no se configuró CONTROL_PASSWORD. Guardar una copia de esa carpeta al finalizar si se necesita conservar el registro. No editar el archivo durante la partida. Una recarga permite reconstruir el resultado guardado; no vuelve a sortear. Las imágenes oficiales están incluidas en el repositorio.
 
 ## Diseño e imágenes
 
-La pantalla incluye el logo oficial y la fotografía original de la fachada aportados por APAIB. Las dos hojas de la puerta usan la misma fotografía, alineada mediante CSS; se abren en perspectiva para revelar el premio sobre un interior ilustrado. No se alteraron los archivos originales. El escenario mantiene la proporción de la foto y agrega bandas cuando la pantalla tiene otra proporción. Los números se distribuyen a ambos lados de la puerta y el sonido se sintetiza en el navegador.
+La pantalla incluye el logo oficial y la fotografía original de la fachada aportados por APAIB. Las dos hojas de la puerta usan la misma fotografía, alineada mediante CSS; giran hacia adentro durante 3,4 segundos, manteniendo visibles sus hojas, sombras y bisagras. El premio ilustrado aparece progresivamente en el interior. Los anuncios y la cantidad de papelitos tienen una jerarquía descendente: TV, robot aspiradora, parlante y smartwatch. No se alteraron los archivos originales. El escenario mantiene la proporción de la foto y agrega bandas cuando la pantalla tiene otra proporción. Los números se distribuyen a ambos lados de la puerta y el sonido se sintetiza en el navegador.
 
-Se verificaron carga de imágenes, controles, selección de finalistas y apertura en Chromium. Falta el ensayo con el proyector y teléfono reales y la validación en WNPower.
+Se verificaron en Chromium la carga de imágenes, los controles, la selección de finalistas, la apertura intermedia y completa, los mensajes y tamaños de los cuatro tipos de premio, la cancelación del reinicio y el reinicio confirmado desde un control de tamaño móvil. El estado reiniciado también se verificó después de reiniciar el servidor. Falta el ensayo con el proyector y teléfono reales y la validación en WNPower.
 
 ## Desarrollo y validación
 

@@ -29,6 +29,10 @@ test('Servidor web: sesiones, origen, concurrencia, persistencia y cierre de ses
   const begun=await post({action:'begin',revision:1},cookie);assert.equal(begun.status,200);const saved=await begun.json();
   await stop();await start();assert.deepEqual(await fetch(base+'/api/state').then(r=>r.json()),saved);assert.equal((await post({action:'spin',revision:2},cookie)).status,401);
   const again=await post({action:'login',pin:'test-only-password-apaib'});const cookie2=again.headers.get('set-cookie').split(';')[0];
+  const rejectedReset=await post({action:'reset',revision:saved.revision,confirm:'invalid'},cookie2);assert.equal(rejectedReset.status,400);
+  assert.deepEqual(await fetch(base+'/api/state').then(r=>r.json()),saved);
+  const reset=await post({action:'reset',revision:saved.revision,confirm:'REINICIAR'},cookie2);assert.equal(reset.status,200);
+  const clean=await reset.json();assert.equal(clean.phase,'setup');assert.deepEqual(clean.enabled,[]);assert.deepEqual(clean.finalists,[]);assert.deepEqual(clean.history,[]);assert.equal(clean.revision,saved.revision+1);
   await fetch(base+'/api/logout',{method:'POST',headers:{Cookie:cookie2}});
   assert.equal((await post({action:'spin',revision:2},cookie2)).status,401);
   for(let i=0;i<9;i++)assert.equal((await post({action:'login',pin:'wrong'})).status,403);

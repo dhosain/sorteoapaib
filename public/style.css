@@ -29,3 +29,29 @@ body:has(.stage){display:grid;place-items:center;min-height:100dvh;background:#1
 .scene>.keys{grid-template-rows:repeat(13,minmax(0,1fr))}
 .stage .key{display:flex;justify-content:center;align-items:center;gap:6px;min-height:0;line-height:1}
 .key-icon{width:1.2em;height:.7em;flex-shrink:0}
+/* Inward opening: the free edges recede into the doorway while the hinges
+   stay fixed. Angles below 90 degrees preserve the visible door surfaces. */
+.stage .doorframe{overflow:hidden;perspective:calc(var(--photo-width) * .42);perspective-origin:50% 48%;isolation:isolate}
+.stage .leaves{transform-style:preserve-3d}
+.stage .leaf{position:relative;flex-shrink:0;transform:rotateY(0deg);transform-style:preserve-3d;transition:transform 3.4s cubic-bezier(.3,.02,.2,1);box-shadow:inset 0 0 0 1px #15313f66}
+.stage .leaf:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#0000,#000a);opacity:0;transition:opacity 3.4s;pointer-events:none}
+.stage .leaf:last-child:after{background:linear-gradient(270deg,#0000,#000a)}
+.stage.open .leaf:first-child{transform:rotateY(78deg)}
+.stage.open .leaf:last-child{transform:rotateY(-78deg)}
+.stage.open .leaf:after{opacity:.8}
+.stage.settled .leaf,.stage.settled .leaf:after{transition:none}
+.stage .inside{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:8% 14%;background:radial-gradient(ellipse at 50% 30%,#b49b52 0%,#385246 48%,#0b201b 100%);box-shadow:inset 0 0 50px 10px #000a}
+.stage .inside:before{content:'';position:absolute;inset:75% -10% -10%;background:linear-gradient(#d4bd7777,#71643c);transform:perspective(90px) rotateX(25deg);border-top:1px solid #ebd79855}
+.prize-art{position:relative;width:100%;max-height:45%;flex-shrink:0;filter:drop-shadow(0 12px 8px #0006)}
+.prize-label{position:relative;text-align:center;font-size:clamp(12px,1.8vw,29px);text-shadow:0 2px 8px #000;font-weight:800;line-height:1.2}
+.stage .winner{left:5%;right:5%;bottom:4%;background:linear-gradient(110deg,#163e31f5,#183124f5);padding:1% 2%;border-color:#edce80}
+.stage .winner strong{display:block;line-height:1.12;text-wrap:balance}
+.winner-number{display:block;font-size:clamp(12px,1.6vw,26px);margin-top:8px;font-weight:500}
+.stage .prize-tv strong{font-size:clamp(24px,4.4vw,74px)}
+.stage .prize-robot strong{font-size:clamp(22px,3.7vw,62px)}
+.stage .prize-speaker strong{font-size:clamp(20px,3.1vw,52px)}
+.stage .prize-watch strong{font-size:clamp(18px,2.6vw,44px)}
+.reset-dialog{color:#fff9e9;background:#16392f;border:1px solid #d5b775;border-radius:16px;padding:24px;max-width:min(520px,92vw);box-shadow:0 20px 80px #0009}
+.reset-dialog::backdrop{background:#071e17bb}
+.reset-dialog h2{margin-top:0}
+@media(prefers-reduced-motion:reduce){.stage .leaf,.stage .leaf:after{transition:none}}
