@@ -1,8 +1,8 @@
-# Imágenes originales pendientes
+# Imágenes oficiales de APAIB
 
-Subir aquí los archivos originales, sin modificar:
+Originales aportados por el usuario, conservados sin modificar:
 
-- fachada.jpg: fotografía de la fachada y la puerta.
-- logo.png: logo oficial de APAIB.
+- Fachada desgastada con puerta azul.png: escenario y texturas de las hojas animadas.
+- Logo oficial fondo verde 480.png: logo de la cabecera.
 
-Las imágenes visibles en el chat no quedaron disponibles como archivos en el entorno. Esta carpeta permite entregarlas a través de GitHub. Todavía no se incorporaron al diseño ni a la apertura animada: hay que preparar los elementos de la puerta y validar la escena una vez disponibles.
+El servidor las publica en /assets/fachada.png y /assets/logo.png. La separación visual de las hojas se realiza con fondos CSS, sin editar la fotografía.

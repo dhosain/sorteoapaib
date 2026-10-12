@@ -35,11 +35,13 @@ En el celular, conectado al mismo Wi-Fi, abrir `http://DIRECCION-DE-LA-COMPUTADO
 5. Puede acercarse cualquier finalista pendiente. Seleccionar su número y probar su llave. Esperar la animación y entregar el premio; luego continuar. No avanzar mientras la animación esté en curso.
 6. Al finalizar aparecen los resultados. Reiniciar requiere escribir REINICIAR. Para ensayar, usar una partida separada y reiniciar antes del evento.
 
-Los datos se guardan en `.data/game.json` después de cada acción. Al reiniciar el servidor la partida continúa y el código local cambia si no se configuró CONTROL_PASSWORD. Guardar una copia de esa carpeta al finalizar si se necesita conservar el registro. No editar el archivo durante la partida. Una recarga permite reconstruir el resultado guardado; no vuelve a sortear. La foto cargada queda solamente en el navegador de la pantalla.
+Los datos se guardan en `.data/game.json` después de cada acción. Al reiniciar el servidor la partida continúa y el código local cambia si no se configuró CONTROL_PASSWORD. Guardar una copia de esa carpeta al finalizar si se necesita conservar el registro. No editar el archivo durante la partida. Una recarga permite reconstruir el resultado guardado; no vuelve a sortear. Las imágenes oficiales están incluidas en el repositorio.
 
 ## Diseño e imágenes
 
-La puerta actual es una ilustración provisional. El botón Cargar fotografía permite usar la imagen de la fachada como fondo; esta imagen no se incluye en el repositorio. Para animar fielmente las hojas de la puerta fotografiada, hace falta preparar y añadir sus recortes. El logo oficial tampoco está incluido. Los premios se muestran con texto, sin imágenes. El sonido se sintetiza en el navegador; no requiere descargas.
+La pantalla incluye el logo oficial y la fotografía original de la fachada aportados por APAIB. Las dos hojas de la puerta usan la misma fotografía, alineada mediante CSS; se abren en perspectiva para revelar el premio sobre un interior ilustrado. No se alteraron los archivos originales. El escenario mantiene la proporción de la foto y agrega bandas cuando la pantalla tiene otra proporción. Los números se distribuyen a ambos lados de la puerta y el sonido se sintetiza en el navegador.
+
+Se verificaron carga de imágenes, controles, selección de finalistas y apertura en Chromium. Falta el ensayo con el proyector y teléfono reales y la validación en WNPower.
 
 ## Desarrollo y validación
 

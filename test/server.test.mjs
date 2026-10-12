@@ -17,6 +17,7 @@ test('Servidor web: sesiones, origen, concurrencia, persistencia y cierre de ses
  async function post(body,cookie='',origin=base){return fetch(base+'/api/action',{method:'POST',headers:{'Content-Type':'application/json',Cookie:cookie,Origin:origin},body:JSON.stringify(body)});}
  try{
   await start();assert.equal((await fetch(base+'/healthz')).status,200);assert.equal((await fetch(base+'/control')).status,200);
+  for(const path of ['/assets/fachada.png','/assets/logo.png']){const r=await fetch(base+path);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),'image/png');assert.deepEqual([...new Uint8Array(await r.arrayBuffer()).slice(0,8)],[137,80,78,71,13,10,26,10]);}
   assert.equal((await post({action:'begin',revision:0})).status,401);
   assert.equal((await post({action:'login',pin:'incorrect'})).status,403);
   assert.equal((await post({action:'login',pin:'test-only-password-apaib'},'','https://another-site.example')).status,403);

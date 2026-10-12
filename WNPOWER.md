@@ -32,4 +32,4 @@ No ingresar el código privado por HTTP. Cuando el certificado sea válido, habi
 
 Hacer una partida de ensayo con al menos diez llaves. Comprobar cambios entre dos dispositivos, cinco aperturas exactas y diez intentos. Reiniciar la aplicación desde cPanel y comprobar recuperación de la partida e ingreso de código nuevamente. Reiniciar la partida desde Administración antes del evento, únicamente tras terminar el ensayo. Guardar copia privada de sorteoapaib-data si se necesita respaldo.
 
-El paquete se validó con Node.js en el entorno de desarrollo, no contra el Passenger de WNPower. La emisión SSL, configuración de proceso único y prueba real en el alojamiento siguen pendientes. La foto y logo originales aún no están incluidos.
+El paquete se validó con Node.js en el entorno de desarrollo, no contra el Passenger de WNPower. La emisión SSL, configuración de proceso único y prueba real en el alojamiento siguen pendientes. La foto y logo oficiales están incluidos en public/assets. Las imágenes y la apertura se validaron en Chromium; falta probarlos en el alojamiento y proyector reales.

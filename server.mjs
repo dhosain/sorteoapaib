@@ -41,8 +41,8 @@ const server=http.createServer(async(req,res)=>{
   if(data.revision!==state.revision){res.writeHead(409);res.end('La pantalla cambió. Intentá nuevamente.');return;}
   if(data.action==='reset'){if(data.confirm!=='REINICIAR')throw Error('Confirmación inválida');save({...fresh(),revision:state.revision+1});}else save(transition(state,data.action,data));json(res,200,publicState(state));
  }catch(e){res.writeHead(400);res.end(e.message);}return;}
- const routes={'/':'index.html','/control':'index.html','/app.js':'app.js','/style.css':'style.css'};if(req.method!=='GET'||!routes[url.pathname]){res.writeHead(404);res.end();return;}
- res.setHeader('Content-Type',url.pathname.endsWith('.js')?'text/javascript':url.pathname.endsWith('.css')?'text/css':'text/html');res.end(readFileSync(new URL('./public/'+routes[url.pathname],import.meta.url)));
+ const routes={'/':'index.html','/control':'index.html','/app.js':'app.js','/style.css':'style.css','/assets/fachada.png':'assets/Fachada desgastada con puerta azul.png','/assets/logo.png':'assets/Logo oficial fondo verde 480.png'};if(req.method!=='GET'||!routes[url.pathname]){res.writeHead(404);res.end();return;}
+ res.setHeader('Content-Type',url.pathname.endsWith('.png')?'image/png':url.pathname.endsWith('.js')?'text/javascript':url.pathname.endsWith('.css')?'text/css':'text/html');res.end(readFileSync(new URL('./public/'+routes[url.pathname],import.meta.url)));
 });
 setInterval(()=>{for(const res of clients)res.write(': heartbeat\n\n');for(const [k,v] of sessions)if(v<Date.now())sessions.delete(k);},15000).unref();
 server.listen(typeof PhusionPassenger !== 'undefined' ? 'passenger' : port,...(typeof PhusionPassenger !== 'undefined' ? [] : ['0.0.0.0']),()=>{console.log('APAIB · servidor activo · puerto '+(typeof server.address()==='string'?'Passenger':server.address().port));if(!production&&!process.env.CONTROL_PASSWORD)console.log('Código de control local: '+password);});
