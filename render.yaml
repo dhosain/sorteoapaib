@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: apaib-97
+    runtime: node
+    plan: starter
+    buildCommand: npm test
+    startCommand: npm start
+    healthCheckPath: /healthz
+    numInstances: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: DATA_DIR
+        value: /var/data/apaib
+      - key: CONTROL_PASSWORD
+        sync: false
+    disk:
+      name: apaib-partida
+      mountPath: /var/data
+      sizeGB: 1
