@@ -1,4 +1,4 @@
-import {VERSION,PRIZES,OPENING_MS,TRY_MS} from '/config.js?v=3.0.1';
+import {VERSION,PRIZES,OPENING_MS,TRY_MS,ANNOUNCE_DELAY_MS} from '/config.js?v=3.0.2';
 const app=document.querySelector('#app'),control=location.pathname==='/control';let state,pin='',authenticated=false,audioContext,sound=localStorage.getItem('apaib-sound')!=='off',selected=new Set(),editing=false,lastReveal='',timer,highlight,reduceMotion=localStorage.getItem('apaib-motion')==='reduced';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function tone(freq=440,duration=.15){if(!sound||audioContext?.state!=='running')return;const o=audioContext.createOscillator(),g=audioContext.createGain();o.frequency.value=freq;g.gain.setValueAtTime(.08,audioContext.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);o.connect(g);g.connect(audioContext.destination);o.start();o.stop(audioContext.currentTime+duration);}
@@ -90,7 +90,7 @@ function reveal(r,animate){
     for(let i=0;i<count;i++){const p=document.createElement('i');p.className='particle';p.style.left=Math.random()*100+'%';p.style.background=['#f1cf71','#fff','#168154','#7dbeec'][i%4];p.style.animationDelay=Math.random()+'s';stage.append(p);setTimeout(()=>p.remove(),4500);}
    }
   }
-  if(!r.presented)setTimeout(()=>{if(stage.isConnected)acknowledge(r.presentationId);},animate?(r.opens?Math.max(OPENING_MS,2700):2700):300);
+  if(!r.presented)setTimeout(()=>{if(stage.isConnected)acknowledge(r.presentationId);},animate?(r.opens?Math.max(OPENING_MS-ANNOUNCE_DELAY_MS,2700):2700):300);
  };
  const open=()=>{
   if(!stage.isConnected)return;
@@ -99,7 +99,8 @@ function reveal(r,animate){
    // Paint the closed doors before changing their transforms. Keep the
    // leaves visible below 90 degrees, rotating inward around their hinges.
    void stage.querySelector('.leaf').offsetWidth;stage.classList.add('open');
-   announce();
+   if(animate){banner.innerHTML='La puerta se está abriendo…'+selectedKeys();setTimeout(announce,ANNOUNCE_DELAY_MS);}
+   else announce();
   }else announce();
  };
  if(animate){stage.classList.add('trying');tone(180,1);setTimeout(open,TRY_MS);}

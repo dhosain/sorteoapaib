@@ -1,5 +1,6 @@
-export const VERSION = '3.0.1';
+export const VERSION = '3.0.2';
 export const OPENING_MS = 4800;
+export const ANNOUNCE_DELAY_MS = 1500;
 export const TRY_MS = 1700;
 export const PRIZES = [
  {rank:1,name:'Smart TV de 55 pulgadas',message:'¡Ganaste un Smart TV de 55 pulgadas!',kind:'tv55',size:'first',confetti:160},

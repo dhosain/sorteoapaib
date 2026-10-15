@@ -1,4 +1,4 @@
-# APAIB - 97° Aniversario · versión 3.0.1
+# APAIB - 97° Aniversario · versión 3.0.2
 
 Aplicación de sorteo web para un evento, con pantalla proyectada y controles en el celular. El alojamiento elegido es WNPower/cPanel: ver [WNPOWER.md](WNPOWER.md), incluidos los pasos para actualizar desde versiones anteriores. No hay dependencias externas que instalar. Requiere Node.js >=22; el panel del evento usa 24.21.0.
 
@@ -18,7 +18,7 @@ La pantalla está en `/` y el control en `/control`. Ingresar en el control la c
 
 Sonido habilitado por defecto y botón Desactivar sonido. La preferencia elegida se recuerda en ese navegador. Por restricciones del navegador, hay que tocar o hacer clic una vez en la pantalla proyectada (por ejemplo al entrar en pantalla completa) para autorizar el audio. El aviso desaparece al habilitarse. No es necesario habilitar audio en el celular de control.
 
-Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. El cartel ganador, los papelitos y la fanfarria de metales comienzan junto con el giro de las hojas, sin esperar a que termine la apertura. El botón Continuar sigue bloqueado hasta finalizar los 4,8 segundos del giro. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. La apertura lenta para proyección queda habilitada por defecto, incluso si el sistema reduce animaciones. El operador puede elegir explícitamente Reducir movimiento con el botón de la pantalla; la preferencia se recuerda. Los papelitos también se suprimen en ese modo.
+Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. El cartel ganador, los papelitos y la fanfarria de metales comienzan juntos 1,5 segundos después de iniciarse el giro de las hojas. El botón Continuar sigue bloqueado hasta finalizar los 4,8 segundos del giro. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. La apertura lenta para proyección queda habilitada por defecto, incluso si el sistema reduce animaciones. El operador puede elegir explícitamente Reducir movimiento con el botón de la pantalla; la preferencia se recuerda. Los papelitos también se suprimen en ese modo.
 
 ## Guardado e integridad
 
@@ -44,3 +44,5 @@ La actualización se prueba aquí, sin operar ni reiniciar la partida del sitio 
 La comprobación de navegador está en `scripts/verify-browser.cjs` (`npm run test:browser`). Usa Playwright como herramienta de desarrollo opcional y un Chromium instalado: instalarlo localmente con `npm install --no-save --package-lock=false playwright` y `npx playwright install chromium`, o indicar un ejecutable ya instalado mediante CHROMIUM_PATH. No se necesita Playwright en WNPower ni para ejecutar la aplicación. La prueba crea una partida y capturas en un directorio temporal independiente; nunca opera el sitio publicado.
 
 En 3.0.1 se verificó también el caso de ocho llaves elegidas sin intentos finales, el giro lento con la preferencia de movimiento reducido del sistema activada y el inicio simultáneo del cartel y los osciladores de la fanfarria al comenzar la apertura.
+
+En 3.0.2 se verifica además que durante los primeros 900 ms de apertura no haya cartel ganador, fanfarria ni papelitos, y que el anuncio comience aproximadamente a los 1500 ms. El botón Continuar sigue esperando el final de la apertura, sin agregar otra espera al operador.
