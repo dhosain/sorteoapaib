@@ -9,8 +9,8 @@ import {once} from 'node:events';
 test('Servidor web: sesiones, origen, concurrencia, persistencia y cierre de sesión',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'apaib-web-'));
  let child,base;
- async function start(){
-  child=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,NODE_ENV:'production',CONTROL_PASSWORD:'test-only-password-apaib',PORT:'0',DATA_DIR:dir},stdio:['ignore','pipe','pipe']});
+ async function start(controlPassword='test-only-password-apaib'){
+  child=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,NODE_ENV:'production',CONTROL_PASSWORD:controlPassword,PORT:'0',DATA_DIR:dir},stdio:['ignore','pipe','pipe']});
   let text='';await new Promise((resolve,reject)=>{child.stdout.on('data',chunk=>{text+=chunk;const m=text.match(/puerto (\d+)/);if(m){base='http://127.0.0.1:'+m[1];resolve();}});child.once('exit',code=>reject(Error('Server exited '+code)));child.once('error',reject);});
  }
  async function stop(){const p=child;const exited=once(p,'exit');p.kill();await exited;child=null;}
@@ -27,7 +27,7 @@ test('Servidor web: sesiones, origen, concurrencia, persistencia y cierre de ses
   assert.equal((await post({action:'begin',revision:0},cookie)).status,409);
   assert.equal((await post({action:'begin',revision:1},cookie,'https://another-site.example')).status,403);
   const begun=await post({action:'begin',revision:1},cookie);assert.equal(begun.status,200);const saved=await begun.json();
-  await stop();await start();assert.deepEqual(await fetch(base+'/api/state').then(r=>r.json()),saved);assert.equal((await post({action:'spin',revision:2},cookie)).status,401);
+  await stop();await start();assert.deepEqual(await fetch(base+'/api/state').then(r=>r.json()),saved);assert.equal((await fetch(base+'/api/session',{headers:{Cookie:cookie}}).then(r=>r.json())).authenticated,true);
   const again=await post({action:'login',pin:'test-only-password-apaib'});const cookie2=again.headers.get('set-cookie').split(';')[0];
   const rejectedReset=await post({action:'reset',revision:saved.revision,confirm:'invalid'},cookie2);assert.equal(rejectedReset.status,400);
   assert.deepEqual(await fetch(base+'/api/state').then(r=>r.json()),saved);
@@ -37,5 +37,10 @@ test('Servidor web: sesiones, origen, concurrencia, persistencia y cierre de ses
   assert.equal((await post({action:'spin',revision:2},cookie2)).status,401);
   for(let i=0;i<9;i++)assert.equal((await post({action:'login',pin:'wrong'})).status,403);
   assert.equal((await post({action:'login',pin:'wrong'})).status,429);
+  await stop();await start('replacement-test-password');
+  assert.equal((await fetch(base+'/api/session',{headers:{Cookie:cookie}}).then(r=>r.json())).authenticated,false);
+  assert.equal((await post({action:'login',pin:'test-only-password-apaib'})).status,403);
+  assert.equal((await post({action:'login',pin:'replacement-test-password'})).status,200);
+  assert.deepEqual(await fetch(base+'/api/state').then(r=>r.json()),clean);
  }finally{if(child)await stop();await rm(dir,{recursive:true,force:true});}
 });

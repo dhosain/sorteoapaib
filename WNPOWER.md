@@ -1,35 +1,29 @@
-# Publicación en WNPower / cPanel
+# WNPower / cPanel · actualizar a 3.0.0
 
-## 1. Subir los archivos
+## Actualización desde la versión anterior
 
-En Administrador de archivos, entrar en la carpeta principal de la cuenta (fuera de public_html) y crear `sorteoapaib`. Subir y extraer allí el ZIP: deben quedar directamente `app.cjs`, `server.mjs`, `game.mjs`, `package.json` y la carpeta `public`. No subir datos de una partida anterior. La carpeta del dominio y la raíz de la aplicación son distintas: cPanel/Passenger conecta ambas.
+1. En GitHub, descargar main con Code → Download ZIP. Descomprimir en la computadora; abrir la carpeta exterior sorteoapaib-main.
+2. En cPanel → Setup Node.js App, detener la aplicación del sorteo. No tocar otros sitios.
+3. Guardar una copia privada de la carpeta de código /home/apaiborgar/sorteoapaib y de los datos /home/apaiborgar/sorteoapaib-data, fuera de directorios públicos. No subir los datos a GitHub ni enviar sesiones o claves por chat.
+4. Subir a /home/apaiborgar/sorteoapaib los archivos app.cjs, server.mjs, game.mjs, storage.mjs y package.json, y la carpeta public completa. Sobrescribir los archivos del código anterior. Los archivos deben quedar directamente en sorteoapaib, sin una carpeta sorteoapaib-main intermedia. Esta vez no alcanza con actualizar public: cambiaron el servidor y el guardado. public incluye el nuevo config.js y las imágenes originales.
+5. Conservar las variables CONTROL_PASSWORD y DATA_DIR. No sobrescribir, eliminar ni mover sorteoapaib-data. Verificar Node.js 24.21.0, modo Production y archivo de inicio app.cjs. No hacen falta npm install ni nuevas dependencias.
+6. Iniciar la aplicación. Si cPanel la muestra iniciada, pulsar Reiniciar. Si falla, consultar passenger.log.
+7. Cerrar y volver a abrir las pestañas de pantalla y controles; en Windows puede hacerse Ctrl+F5. Comprobar que /control muestre Versión 3.0.0 y que /healthz devuelva ok:true y version:3.0.0. Ingresar el código de control si se solicita.
+8. Tras guardar el respaldo del ensayo anterior, usar Administración → Reiniciar partida y confirmar. La versión anterior tenía otros premios: no se permite continuar una final anterior con el catálogo nuevo ni reasignar premios ya sorteados. Volver a habilitar las tarjetas entregadas y guardar.
+9. En la pantalla principal, hacer clic o tocar una vez para autorizar el audio; puede aprovecharse el botón Pantalla completa. El sonido está habilitado por defecto pero el navegador necesita ese gesto local. El control en el celular no habilita el audio de la computadora.
+10. Hacer un ensayo completo manteniendo la pantalla principal abierta. Deben registrarse exactamente cinco premios principales (TV 55, TV 40, aspiradora robot, parlante Bluetooth, smartwatch) y cinco llaves sin apertura. El botón de continuar espera a que termine la presentación en la pantalla. Comprobar apertura lenta y audio con los equipos reales. Luego reiniciar el ensayo para dejar preparada la partida del evento y volver a habilitar las tarjetas entregadas.
 
-## 2. Crear la aplicación Node.js
+## Configuración de la aplicación
 
-- Versión: 24.21.0.
-- Modo: Production.
-- Raíz: sorteoapaib.
-- URL: sorteo.apaib.org.ar, campo de ruta vacío.
-- Archivo de inicio: app.cjs.
-- Log Passenger: /home/apaiborgar/sorteoapaib/passenger.log.
+- Node.js: 24.21.0; modo: Production.
+- Raíz: sorteoapaib; URL: sorteo.apaib.org.ar, campo de ruta vacío.
+- Inicio: app.cjs; log: /home/apaiborgar/sorteoapaib/passenger.log.
+- CONTROL_PASSWORD: código privado de 12–256 caracteres, ingresado únicamente en el panel.
+- DATA_DIR: /home/apaiborgar/sorteoapaib-data, fuera de la raíz web.
+- No fijar PORT: Passenger gestiona la escucha. La carpeta del dominio y la raíz de aplicación son diferentes; cPanel conecta ambas.
 
-Añadir variables:
+El DNS autoritativo se administra en Cloudflare. Mantener SSL válido y HTTPS para ingresar la clave. Excluir /api/* de caché. La sincronización usa peticiones cortas cada 750 ms. Esta edición permite procesos de Passenger en la misma máquina compartiendo DATA_DIR; sigue siendo suficiente un único trabajador para el evento. No distribuir la aplicación entre servidores con discos independientes.
 
-- CONTROL_PASSWORD: elegir un código privado de 12 a 256 caracteres. No enviarlo por chat.
-- DATA_DIR: /home/apaiborgar/sorteoapaib-data.
+El servidor guarda también las sesiones privadas, compartidas entre trabajadores. Un reinicio conserva las sesiones de esta versión si la clave sigue igual; cambiar la clave y reiniciar las invalida. La primera actualización desde una edición anterior puede requerir volver a ingresar el código.
 
-La ruta de cuenta anterior proviene del panel mostrado; verificarla si cPanel muestra otra. DATA_DIR debe estar fuera de cualquier directorio web. No configurar PORT: Passenger gestiona la escucha. No hay paquetes externos que instalar. Crear la aplicación y reiniciarla tras subir los archivos.
-
-## 3. Importante: un único proceso
-
-La aplicación mantiene sesiones y sincronización en memoria, y la partida en un archivo. Antes de usarla, pedir a soporte que configure esta aplicación Passenger con un único proceso trabajador (PassengerMaxInstancesPerApp 1), sin otros trabajadores Node ejecutando el mismo proyecto. No configurar varios procesos o instancias: provocarían estados inconsistentes. No modificar configuraciones globales ni el sitio principal de APAIB.
-
-La sincronización utiliza peticiones cortas cada 750 ms para evitar depender de conexiones SSE largas y del buffering del proxy. Pedir que no se cacheen las rutas de esta aplicación, especialmente /api/*. Si el proveedor necesita una regla específica para excluir el subdominio de NGINX caching, solicitarla.
-
-## 4. Comprobar tras resolver SSL
-
-No ingresar el código privado por HTTP. Cuando el certificado sea válido, habilitar la redirección HTTPS para este subdominio. Abrir la URL principal para la pantalla y /control en el celular. /healthz debe responder con {"ok":true}.
-
-Hacer una partida de ensayo con al menos diez llaves. Comprobar cambios entre dos dispositivos, cinco aperturas exactas y diez intentos. Reiniciar la aplicación desde cPanel y comprobar recuperación de la partida e ingreso de código nuevamente. Reiniciar la partida desde Administración antes del evento, únicamente tras terminar el ensayo. Guardar copia privada de sorteoapaib-data si se necesita respaldo.
-
-El paquete se validó con Node.js en el entorno de desarrollo, no contra el Passenger de WNPower. La emisión SSL, configuración de proceso único y prueba real en el alojamiento siguen pendientes. La foto y logo oficiales están incluidos en public/assets. Las imágenes y la apertura se validaron en Chromium; falta probarlos en el alojamiento y proyector reales.
+El arranque de Passenger se verificó mediante su interfaz simulada y la aplicación en Chromium en desarrollo. No equivale a una validación de esta actualización en WNPower; realizar el ensayo anterior antes del evento.

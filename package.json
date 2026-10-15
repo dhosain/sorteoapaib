@@ -1,1 +1,14 @@
-{"name":"apaib-97","version":"1.0.0","private":true,"scripts":{"start":"node server.mjs","test":"node --test"},"engines":{"node":">=22"}}
+{
+  "name": "apaib-97",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "test:browser": "node scripts/verify-browser.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module"
+}

@@ -1,55 +1,44 @@
-# APAIB · 97 aniversario
+# APAIB - 97° Aniversario · versión 3.0.0
 
-Para el alojamiento elegido, consultar [WNPOWER.md](WNPOWER.md). La sincronización actual usa consultas cortas cada 750 ms.
-
-Aplicación local de sorteo, sin paquetes externos ni servicios pagos. Una computadora sirve la pantalla y los controles del celular. Es un primer prototipo: requiere ensayo y revisión visual antes del evento.
-
-## Versión web (publicación pendiente)
-
-La computadora abre la URL principal; el celular abre la misma URL con `/control`. Ambos se sincronizan en tiempo real. El operador ingresa el código privado configurado en el alojamiento. El público no necesita código para ver la pantalla. El código no se guarda en el navegador: el servidor crea una sesión de 12 horas mediante cookie HttpOnly, SameSite y Secure en producción. Los intentos de acceso están limitados. Un reinicio del servidor conserva la partida pero obliga a ingresar el código otra vez.
-
-Hay una configuración de Render en `render.yaml`, pendiente de confirmar el proveedor del usuario. Requiere un servicio Node.js con una sola instancia y un disco persistente; la configuración declara un plan Starter, que puede generar cargos. No crear el servicio hasta revisar el plan y costo en la cuenta del usuario. No usar un disco efímero para la fiesta.
-
-En Render, conectar el repositorio GitHub y crear un Blueprint desde `render.yaml`. Configurar `CONTROL_PASSWORD` con un código privado de al menos 12 caracteres en el panel seguro del proveedor; no enviarlo por chat ni guardarlo en Git. El servicio usa `DATA_DIR=/var/data/apaib`, disco de 1 GB, `npm test` como validación de construcción, `npm start` para inicio y `/healthz` para salud. Render debe terminar HTTPS y mantener las conexiones SSE; no agregar caché sobre `/events` ni `/api/*`. No escalar a más de una instancia: esta aplicación guarda un archivo local y mantiene las sesiones en memoria.
-
-Después del despliegue, verificar pantalla y control desde dos dispositivos, hacer una partida de ensayo, reiniciar el servicio y comprobar que se recupera. Luego reiniciar la partida desde Administración. No se ha verificado un despliegue real ni HTTPS en el proveedor todavía. La URL muestra una única partida compartida; no es un servicio para múltiples eventos independientes.
-
-## Inicio local en Windows
-
-Instalar Node.js 24 LTS desde su sitio oficial. En esta carpeta, abrir una terminal y ejecutar:
-
-```
-npm start
-```
-
-La consola muestra un código local de seis dígitos, salvo que se configure CONTROL_PASSWORD. Para conocer la IP de la computadora, usar ipconfig en Windows. En la computadora, abrir `http://localhost:3000` para proyectar y `http://localhost:3000/control` para operar. Activar sonido con el botón de la pantalla y entrar en pantalla completa. No cerrar la terminal mientras dure el evento.
-
-En el celular, conectado al mismo Wi-Fi, abrir `http://DIRECCION-DE-LA-COMPUTADORA:3000/control`. Ingresar el PIN. Si Windows pregunta, permitir Node.js en la red privada. Una red de invitados con aislamiento entre dispositivos puede impedir esta conexión; en ese caso operar desde la computadora o usar un router propio. Internet no es necesario para esta modalidad. No exponer el puerto a Internet: el PIN es para control en una red local de confianza, y el tráfico local usa HTTP.
+Aplicación de sorteo web para un evento, con pantalla proyectada y controles en el celular. El alojamiento elegido es WNPower/cPanel: ver [WNPOWER.md](WNPOWER.md), incluidos los pasos para actualizar desde versiones anteriores. No hay dependencias externas que instalar. Requiere Node.js >=22; el panel del evento usa 24.21.0.
 
 ## Operación
 
-1. Habilitar solamente las llaves entregadas y guardar. Debe haber al menos diez. Comenzar bloquea esa configuración.
-2. En cada uno de los cinco turnos, iniciar y detener dos selecciones consecutivas. La luz es una animación; al detener, el servidor elige de manera uniforme con un generador criptográfico.
-3. Confirmar presencia para guardar el finalista. Si está ausente, excluirlo y repetir. Los ausentes se excluyen durante toda la partida. No confirmar un ausente.
-4. Al alcanzar diez finalistas, preparar la final. Se asignan al azar cinco aperturas y cinco premios consuelo, una sola vez. Los premios principales son TV 55 pulgadas, robot aspiradora, parlante y dos smart watches.
-5. Puede acercarse cualquier finalista pendiente. Seleccionar su número y probar su llave. Esperar la animación y entregar el premio; luego continuar. No avanzar mientras la animación esté en curso.
-6. Al finalizar aparecen los resultados. Para reiniciar, abrir Administración, pulsar Reiniciar partida y confirmar en la ventana con botones Cancelar / Reiniciar partida. Para ensayar, usar una partida separada y reiniciar antes del evento.
+La pantalla está en `/` y el control en `/control`. Ingresar en el control la clave privada configurada como CONTROL_PASSWORD. El control muestra la versión instalada, el registro de los diez intentos y los contadores de premios.
 
-Los datos se guardan en `.data/game.json` después de cada acción. Al reiniciar el servidor la partida continúa y el código local cambia si no se configuró CONTROL_PASSWORD. Guardar una copia de esa carpeta al finalizar si se necesita conservar el registro. No editar el archivo durante la partida. Una recarga permite reconstruir el resultado guardado; no vuelve a sortear. Las imágenes oficiales están incluidas en el repositorio.
+1. Habilitar las llaves entregadas. Puede usarse Todas y desmarcar las no entregadas. Guardar selección y comenzar. Debe haber al menos diez llaves.
+2. En cada uno de los cinco turnos, iniciar y detener dos selecciones consecutivas. El servidor elige uniformemente entre las llaves habilitadas, sin repetir finalistas ni ausentes. La luz es una animación independiente del resultado.
+3. Confirmar presencia o marcar ausente y repetir. Los finalistas confirmados quedan amarillos con números negros.
+4. Al alcanzar diez finalistas, preparar la final. Se asignan exactamente cinco aperturas y cinco llaves sin apertura, una sola vez, mediante mezcla criptográfica. Cada premio principal aparece una vez: Smart TV 55 pulgadas, Smart TV 40 pulgadas, Aspiradora Robot, Parlante Bluetooth, Smart Watch.
+5. Puede acercarse cualquier finalista pendiente. Elegir su número y probar su llave. Mantener abierta la pantalla principal: esta debe terminar la presentación y confirmar su recepción. El botón Continuar permanece bloqueado hasta entonces, también en el servidor. Si queda esperando, comprobar la conexión de la pantalla principal; no abrir los controles en lugar de la pantalla.
+6. Al terminar, verificar diez intentos, cinco premios principales y cinco sin apertura. El mensaje final y el registro se muestran en pantalla.
+7. Para volver a empezar: Administración → Reiniciar partida → confirmar. Borra toda la partida, incluida la selección de llaves. No hacerlo durante un evento real sin intención de borrar sus resultados.
 
-## Diseño e imágenes
+## Sonido y animación
 
-La pantalla incluye el logo oficial y la fotografía original de la fachada aportados por APAIB. Las dos hojas de la puerta usan la misma fotografía, alineada mediante CSS; giran hacia adentro durante 3,4 segundos, manteniendo visibles sus hojas, sombras y bisagras. El premio ilustrado aparece progresivamente en el interior. Los anuncios y la cantidad de papelitos tienen una jerarquía descendente: TV, robot aspiradora, parlante y smartwatch. No se alteraron los archivos originales. El escenario mantiene la proporción de la foto y agrega bandas cuando la pantalla tiene otra proporción. Los números se distribuyen a ambos lados de la puerta y el sonido se sintetiza en el navegador.
+Sonido habilitado por defecto y botón Desactivar sonido. La preferencia elegida se recuerda en ese navegador. Por restricciones del navegador, hay que tocar o hacer clic una vez en la pantalla proyectada (por ejemplo al entrar en pantalla completa) para autorizar el audio. El aviso desaparece al habilitarse. No es necesario habilitar audio en el celular de control.
 
-Se verificaron en Chromium la carga de imágenes, los controles, la selección de finalistas, la apertura intermedia y completa, los mensajes y tamaños de los cuatro tipos de premio, la cancelación del reinicio y el reinicio confirmado desde un control de tamaño móvil. El estado reiniciado también se verificó después de reiniciar el servidor. Falta el ensayo con el proyector y teléfono reales y la validación en WNPower.
+Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. Se revela una ilustración del premio y se escucha una fanfarria sintetizada con timbre de metales. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. Se respeta la preferencia de accesibilidad de movimiento reducido del sistema.
 
-## Desarrollo y validación
+## Guardado e integridad
+
+DATA_DIR debe apuntar a un directorio privado y persistente, fuera de la raíz web. La partida se guarda como game.json. El servidor lee la versión actual del archivo y serializa las modificaciones con un bloqueo entre procesos y reemplazo atómico; no usa una copia de la partida en memoria como fuente de verdad. Los bloqueos de un proceso muerto se recuperan después de cinco segundos. No compartir esta carpeta entre máquinas con sistemas de archivos independientes ni editarla durante el evento.
+
+Las sesiones de control se guardan en archivos privados dentro de DATA_DIR/.sessions. Duran doce horas y sobreviven a un reinicio del proceso. Cambiar CONTROL_PASSWORD y reiniciar invalida las sesiones anteriores. El navegador solo recibe una cookie HttpOnly, SameSite y Secure en producción, no la clave. No publicar ni subir DATA_DIR a GitHub.
+
+Antes de cada transición se verifican las diez asignaciones, cinco aperturas, cinco premios diferentes y correspondencia entre llave y registro. Si falta una asignación o hay una inconsistencia, se bloquea el avance con un mensaje en lugar de presentar un resultado inventado. La partida anterior no se transforma silenciosamente al catálogo nuevo: guardar respaldo y reiniciar el ensayo después de actualizar.
+
+## Desarrollo y pruebas
 
 ```
 npm test
 npm start
 ```
 
-No hay instalación de dependencias. Node.js >=22. `PORT` cambia el puerto y `DATA_DIR` permite guardar ensayos separados, por ejemplo en PowerShell: `$env:DATA_DIR='.data-ensayo'; npm start`.
+Sin CONTROL_PASSWORD, el modo local genera una clave temporal y la muestra en consola. La pantalla local usa el puerto 3000 por defecto. PORT y DATA_DIR permiten aislar ensayos. En producción son obligatorios CONTROL_PASSWORD (12–256 caracteres) y DATA_DIR.
 
-Los tests verifican exclusión de ausentes, números habilitados, ausencia de duplicados, cinco aperturas exactas, premios, orden libre y transiciones inválidas. Falta validar visualmente con navegador, proyector y teléfono reales. La autenticación y la configuración de alojamiento están preparadas. Falta desplegar y validar la URL HTTPS real en la cuenta del usuario.
+La suite incluye 500 partidas completas del modelo, asignaciones corruptas o antiguas, confirmaciones atrasadas, doble solicitud, persistencia, sesiones, cambio de clave y una partida HTTP compartida entre dos procesos. Se verificó además en Chromium una final completa desde un control de tamaño móvil: cinco aperturas y cinco sin apertura, mensajes, jerarquía de tamaños, color de llaves, apertura intermedia lenta, fanfarria generada, silencio, cartel final y reinicio.
+
+La actualización se prueba aquí, sin operar ni reiniciar la partida del sitio real. Requiere ensayo en WNPower y en el proyector y equipo de sonido reales.
+
+La comprobación de navegador está en `scripts/verify-browser.cjs` (`npm run test:browser`). Usa Playwright como herramienta de desarrollo opcional y un Chromium instalado: instalarlo localmente con `npm install --no-save --package-lock=false playwright` y `npx playwright install chromium`, o indicar un ejecutable ya instalado mediante CHROMIUM_PATH. No se necesita Playwright en WNPower ni para ejecutar la aplicación. La prueba crea una partida y capturas en un directorio temporal independiente; nunca opera el sitio publicado.
