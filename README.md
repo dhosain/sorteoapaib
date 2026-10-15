@@ -1,10 +1,10 @@
-# APAIB - 97° Aniversario · versión 3.0.0
+# APAIB - 97° Aniversario · versión 3.0.1
 
 Aplicación de sorteo web para un evento, con pantalla proyectada y controles en el celular. El alojamiento elegido es WNPower/cPanel: ver [WNPOWER.md](WNPOWER.md), incluidos los pasos para actualizar desde versiones anteriores. No hay dependencias externas que instalar. Requiere Node.js >=22; el panel del evento usa 24.21.0.
 
 ## Operación
 
-La pantalla está en `/` y el control en `/control`. Ingresar en el control la clave privada configurada como CONTROL_PASSWORD. El control muestra la versión instalada, el registro de los diez intentos y los contadores de premios.
+La pantalla está en `/` y el control en `/control`. Ingresar en el control la clave privada configurada como CONTROL_PASSWORD. El control destaca Llaves elegidas: N/10 durante la selección. El contador de intentos finales aparece solamente durante la final y al terminar; no cuenta llaves sorteadas. También muestra la versión instalada y el registro de premios.
 
 1. Habilitar las llaves entregadas. Puede usarse Todas y desmarcar las no entregadas. Guardar selección y comenzar. Debe haber al menos diez llaves.
 2. En cada uno de los cinco turnos, iniciar y detener dos selecciones consecutivas. El servidor elige uniformemente entre las llaves habilitadas, sin repetir finalistas ni ausentes. La luz es una animación independiente del resultado.
@@ -18,7 +18,7 @@ La pantalla está en `/` y el control en `/control`. Ingresar en el control la c
 
 Sonido habilitado por defecto y botón Desactivar sonido. La preferencia elegida se recuerda en ese navegador. Por restricciones del navegador, hay que tocar o hacer clic una vez en la pantalla proyectada (por ejemplo al entrar en pantalla completa) para autorizar el audio. El aviso desaparece al habilitarse. No es necesario habilitar audio en el celular de control.
 
-Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. Se revela una ilustración del premio y se escucha una fanfarria sintetizada con timbre de metales. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. Se respeta la preferencia de accesibilidad de movimiento reducido del sistema.
+Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. El cartel ganador, los papelitos y la fanfarria de metales comienzan junto con el giro de las hojas, sin esperar a que termine la apertura. El botón Continuar sigue bloqueado hasta finalizar los 4,8 segundos del giro. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. La apertura lenta para proyección queda habilitada por defecto, incluso si el sistema reduce animaciones. El operador puede elegir explícitamente Reducir movimiento con el botón de la pantalla; la preferencia se recuerda. Los papelitos también se suprimen en ese modo.
 
 ## Guardado e integridad
 
@@ -42,3 +42,5 @@ La suite incluye 500 partidas completas del modelo, asignaciones corruptas o ant
 La actualización se prueba aquí, sin operar ni reiniciar la partida del sitio real. Requiere ensayo en WNPower y en el proyector y equipo de sonido reales.
 
 La comprobación de navegador está en `scripts/verify-browser.cjs` (`npm run test:browser`). Usa Playwright como herramienta de desarrollo opcional y un Chromium instalado: instalarlo localmente con `npm install --no-save --package-lock=false playwright` y `npx playwright install chromium`, o indicar un ejecutable ya instalado mediante CHROMIUM_PATH. No se necesita Playwright en WNPower ni para ejecutar la aplicación. La prueba crea una partida y capturas en un directorio temporal independiente; nunca opera el sitio publicado.
+
+En 3.0.1 se verificó también el caso de ocho llaves elegidas sin intentos finales, el giro lento con la preferencia de movimiento reducido del sistema activada y el inicio simultáneo del cartel y los osciladores de la fanfarria al comenzar la apertura.

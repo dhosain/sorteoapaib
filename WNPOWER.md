@@ -1,6 +1,8 @@
-# WNPower / cPanel · actualizar a 3.0.0
+# WNPower / cPanel · actualizar a 3.0.1
 
 ## Actualización desde la versión anterior
+
+Si ya está instalada la versión 3.0.0, para este ajuste basta reemplazar la carpeta public completa y package.json, y reiniciar la aplicación desde cPanel. No hace falta reiniciar la partida ni borrar las llaves elegidas. Cerrar y reabrir pantalla y controles y comprobar Versión 3.0.1. Los pasos completos siguientes también sirven para instalaciones anteriores.
 
 1. En GitHub, descargar main con Code → Download ZIP. Descomprimir en la computadora; abrir la carpeta exterior sorteoapaib-main.
 2. En cPanel → Setup Node.js App, detener la aplicación del sorteo. No tocar otros sitios.
@@ -8,8 +10,8 @@
 4. Subir a /home/apaiborgar/sorteoapaib los archivos app.cjs, server.mjs, game.mjs, storage.mjs y package.json, y la carpeta public completa. Sobrescribir los archivos del código anterior. Los archivos deben quedar directamente en sorteoapaib, sin una carpeta sorteoapaib-main intermedia. Esta vez no alcanza con actualizar public: cambiaron el servidor y el guardado. public incluye el nuevo config.js y las imágenes originales.
 5. Conservar las variables CONTROL_PASSWORD y DATA_DIR. No sobrescribir, eliminar ni mover sorteoapaib-data. Verificar Node.js 24.21.0, modo Production y archivo de inicio app.cjs. No hacen falta npm install ni nuevas dependencias.
 6. Iniciar la aplicación. Si cPanel la muestra iniciada, pulsar Reiniciar. Si falla, consultar passenger.log.
-7. Cerrar y volver a abrir las pestañas de pantalla y controles; en Windows puede hacerse Ctrl+F5. Comprobar que /control muestre Versión 3.0.0 y que /healthz devuelva ok:true y version:3.0.0. Ingresar el código de control si se solicita.
-8. Tras guardar el respaldo del ensayo anterior, usar Administración → Reiniciar partida y confirmar. La versión anterior tenía otros premios: no se permite continuar una final anterior con el catálogo nuevo ni reasignar premios ya sorteados. Volver a habilitar las tarjetas entregadas y guardar.
+7. Cerrar y volver a abrir las pestañas de pantalla y controles; en Windows puede hacerse Ctrl+F5. Comprobar que /control muestre Versión 3.0.1 y que /healthz devuelva ok:true y version:3.0.1. Ingresar el código de control si se solicita.
+8. Solo si se actualiza desde una versión anterior a 3.0.0: tras guardar el respaldo del ensayo anterior, usar Administración → Reiniciar partida y confirmar. La versión anterior tenía otros premios: no se permite continuar una final anterior con el catálogo nuevo ni reasignar premios ya sorteados. Volver a habilitar las tarjetas entregadas y guardar.
 9. En la pantalla principal, hacer clic o tocar una vez para autorizar el audio; puede aprovecharse el botón Pantalla completa. El sonido está habilitado por defecto pero el navegador necesita ese gesto local. El control en el celular no habilita el audio de la computadora.
 10. Hacer un ensayo completo manteniendo la pantalla principal abierta. Deben registrarse exactamente cinco premios principales (TV 55, TV 40, aspiradora robot, parlante Bluetooth, smartwatch) y cinco llaves sin apertura. El botón de continuar espera a que termine la presentación en la pantalla. Comprobar apertura lenta y audio con los equipos reales. Luego reiniciar el ensayo para dejar preparada la partida del evento y volver a habilitar las tarjetas entregadas.
 

@@ -54,7 +54,7 @@ body:has(.stage){display:grid;place-items:center;min-height:100dvh;background:#1
 .reset-dialog{color:#fff9e9;background:#16392f;border:1px solid #d5b775;border-radius:16px;padding:24px;max-width:min(520px,92vw);box-shadow:0 20px 80px #0009}
 .reset-dialog::backdrop{background:#071e17bb}
 .reset-dialog h2{margin-top:0}
-@media(prefers-reduced-motion:reduce){.stage .leaf,.stage .leaf:after{transition:none}}
+
 /* Event edition 3: hierarchy for projection and a deliberately slow opening. */
 .stage header{height:18%;padding-top:1.8%}
 .stage h1{font-size:clamp(24px,4vw,66px);line-height:1.15;margin:0 0 .5%}
@@ -83,4 +83,13 @@ body:has(.stage){display:grid;place-items:center;min-height:100dvh;background:#1
 #audio-hint{position:absolute;bottom:130%;right:0;min-width:240px;padding:10px 14px;background:#123b2ff5;border:1px solid #f1cf71;border-radius:8px;font-size:16px;color:#fff4ca;box-shadow:0 3px 10px #0008}
 .integrity-warning,.connection-warning{position:absolute;left:15%;right:15%;top:19%;z-index:20;background:#742c20;color:white;border:2px solid #ffe356;padding:12px;font-size:clamp(16px,1.5vw,25px);text-align:center}
 .connection-warning[hidden]{display:none}
-@media(prefers-reduced-motion:reduce){.stage .leaf,.stage .leaf:after{transition-duration:.01ms}}
+
+
+/* The projection operator explicitly chooses whether to animate the door. */
+.stage .leaf{transition:transform 4.8s cubic-bezier(.3,.02,.2,1)}
+.stage .leaf:after{transition:opacity 4.8s}
+.stage.settled .leaf,.stage.settled .leaf:after,.stage.reduce-motion .leaf,.stage.reduce-motion .leaf:after{transition:none}
+.stage.reduce-motion .particle{display:none}
+.stage.reduce-motion.trying .doorframe{animation:none}
+.control-progress{font-size:clamp(21px,3vw,30px);font-weight:700;margin:0 0 14px;color:#fff4c6}
+.control-progress strong{color:#ffe000;font-size:1.2em;white-space:nowrap}

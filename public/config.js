@@ -1,4 +1,4 @@
-export const VERSION = '3.0.0';
+export const VERSION = '3.0.1';
 export const OPENING_MS = 4800;
 export const TRY_MS = 1700;
 export const PRIZES = [
