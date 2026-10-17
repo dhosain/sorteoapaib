@@ -1,10 +1,11 @@
 import {mkdirSync,readFileSync,openSync,writeFileSync,closeSync,fsyncSync,renameSync,unlinkSync,statSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {fresh} from './game.mjs';
-export function createStore(dir){
+export const STORAGE_VERSION=2;
+export function createStore(dir,{filename='game.json',initial=fresh}={}){
  mkdirSync(dir,{recursive:true,mode:0o700});
- const file=dir+'/game.json',lock=dir+'/.game-lock';
- function read(){try{return JSON.parse(readFileSync(file,'utf8'));}catch(e){if(e.code==='ENOENT')return fresh();throw e;}}
+ const file=dir+'/'+filename,lock=dir+(filename==='game.json'?'/.game-lock':'/.'+filename+'-lock');
+ function read(){try{return JSON.parse(readFileSync(file,'utf8'));}catch(e){if(e.code==='ENOENT')return initial();throw e;}}
  function acquire(){
   try{return openSync(lock,'wx',0o600);}catch(e){
    if(e.code!=='EEXIST')throw e;

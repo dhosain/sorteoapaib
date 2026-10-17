@@ -2,7 +2,8 @@ import http from 'node:http';
 import {readFileSync,writeFileSync,mkdirSync,unlinkSync,readdirSync} from 'node:fs';
 import {randomInt,randomBytes,scryptSync,timingSafeEqual,createHmac} from 'node:crypto';
 import {fresh,transition,publicState} from './game.mjs';
-import {createStore} from './storage.mjs';
+import {createStore,STORAGE_VERSION} from './storage.mjs';
+if(STORAGE_VERSION!==2)throw Error('Actualizar storage.mjs junto con el servidor');
 import {VERSION} from './public/config.js';
 const production=process.env.NODE_ENV==='production';
 const password=process.env.CONTROL_PASSWORD||(!production?String(randomInt(100000,1000000)):'');
@@ -10,6 +11,8 @@ if(!password||(production&&password.length<12)||password.length>256)throw Error(
 if(production&&!process.env.DATA_DIR)throw Error('Configurar DATA_DIR en un disco persistente');
 const port=Number(process.env.PORT||3000),dir=process.env.DATA_DIR||'.data',store=createStore(dir);
 store.read(); // Refuse to silently overwrite a damaged save file.
+const presentation=createStore(dir,{filename:'presentation.json',initial:()=>({revision:0,sound:true,volume:.85,reduceMotion:false,testId:null,testAt:0,display:{state:'offline',seenAt:0}})});
+function view(s){return {...publicState(s),version:VERSION,presentation:presentation.read()};}
 const sessionDir=dir+'/.sessions';mkdirSync(sessionDir,{recursive:true,mode:0o700});
 const salt=randomBytes(16),hash=scryptSync(password,salt,32),attempts=new Map();
 const authTag=createHmac('sha256',password).update('apaib-session-v3').digest('hex');
@@ -22,9 +25,9 @@ const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  try{
   if(url.pathname==='/healthz'){json(res,200,{ok:true,version:VERSION});return;}
-  if(url.pathname==='/api/state'&&req.method==='GET'){json(res,200,{...publicState(store.read()),version:VERSION});return;}
+  if(url.pathname==='/api/state'&&req.method==='GET'){json(res,200,view(store.read()));return;}
   if(url.pathname==='/api/session'&&req.method==='GET'){json(res,200,{authenticated:authorized(req)});return;}
-  if(req.method==='POST'&&['/api/action','/api/presented','/api/logout'].includes(url.pathname)){
+  if(req.method==='POST'&&['/api/action','/api/presented','/api/logout','/api/presentation','/api/display-status'].includes(url.pathname)){
    const origin=req.headers.origin;
    if(origin&&new URL(origin).host!==req.headers.host){res.writeHead(403);res.end('Origen inválido');return;}
    if(url.pathname==='/api/logout'){
@@ -34,9 +37,26 @@ const server=http.createServer(async(req,res)=>{
    if(!(req.headers['content-type']||'').startsWith('application/json')){res.writeHead(415);res.end('Se requiere JSON');return;}
    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>10000)throw Error('Solicitud demasiado grande');}
    const data=JSON.parse(body);
+   if(url.pathname==='/api/display-status'){
+    if(!['ready','locked','blocked','muted','silent'].includes(data.state))throw Error('Estado de audio inválido');
+    presentation.change(s=>({...s,display:{state:data.state,seenAt:Date.now()}}));json(res,200,{ok:true});return;
+   }
+   if(url.pathname==='/api/presentation'){
+    if(!authorized(req)){res.writeHead(401);res.end('Ingresá nuevamente el código de control');return;}
+    const next=presentation.change(s=>{
+     if(data.revision!==s.revision){const e=Error('Las opciones cambiaron. Intentá nuevamente.');e.status=409;throw e;}
+     const patch=data.patch||{},out={...s};
+     for(const key of Object.keys(patch)){
+      if(['sound','reduceMotion'].includes(key)&&typeof patch[key]==='boolean')out[key]=patch[key];
+      else if(key==='volume'&&Number.isFinite(patch[key])&&patch[key]>=0&&patch[key]<=1)out.volume=patch[key];
+      else if(key==='test'&&patch[key]===true){out.testId=randomBytes(16).toString('hex');out.testAt=Date.now();}
+      else throw Error('Opción de presentación inválida');
+     }return {...out,revision:s.revision+1};
+    });json(res,200,next);return;
+   }
    if(url.pathname==='/api/presented'){
     const next=store.change(s=>{if(!s.revealed||s.revealed.presentationId!==data.presentationId)throw Error('El resultado ya cambió');return s.revealed.presented?s:transition(s,'presented',data);});
-    json(res,200,{...publicState(next),version:VERSION});return;
+    json(res,200,view(next));return;
    }
    if(data.action==='login'){
     const now=Date.now();let entry=attempts.get('login');if(!entry||entry.until<=now)entry={count:0,until:now+60000};attempts.set('login',entry);
@@ -51,9 +71,9 @@ const server=http.createServer(async(req,res)=>{
     if(data.action==='reset'){if(data.confirm!=='REINICIAR')throw Error('Confirmación inválida');return {...fresh(),revision:s.revision+1};}
     return transition(s,data.action,data);
    });
-   json(res,200,{...publicState(next),version:VERSION});return;
+   json(res,200,view(next));return;
   }
-  const routes={'/':'index.html','/control':'index.html','/app.js':'app.js','/config.js':'config.js','/style.css':'style.css','/assets/fachada.png':'assets/Fachada desgastada con puerta azul.png','/assets/logo.png':'assets/Logo oficial fondo verde 480.png'};
+  const routes={'/':'index.html','/control':'index.html','/app.js':'app.js','/audio.js':'audio.js','/config.js':'config.js','/style.css':'style.css','/assets/fachada.png':'assets/Fachada desgastada con puerta azul.png','/assets/logo.png':'assets/Logo oficial fondo verde 480.png'};
   if(req.method!=='GET'||!routes[url.pathname]){res.writeHead(404);res.end();return;}
   res.setHeader('Content-Type',url.pathname.endsWith('.png')?'image/png':url.pathname.endsWith('.js')?'text/javascript':url.pathname.endsWith('.css')?'text/css':'text/html');res.end(readFileSync(new URL('./public/'+routes[url.pathname],import.meta.url)));
  }catch(e){res.writeHead(e.status||400);res.end(e.message);}

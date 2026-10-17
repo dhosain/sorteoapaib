@@ -1,4 +1,4 @@
-export const VERSION = '3.0.2';
+export const VERSION = '3.1.0';
 export const OPENING_MS = 4800;
 export const ANNOUNCE_DELAY_MS = 1500;
 export const TRY_MS = 1700;

@@ -22,6 +22,13 @@ test('Servidor web: sesiones, origen, concurrencia, persistencia y cierre de ses
   assert.equal((await post({action:'login',pin:'incorrect'})).status,403);
   assert.equal((await post({action:'login',pin:'test-only-password-apaib'},'','https://another-site.example')).status,403);
   const login=await post({action:'login',pin:'test-only-password-apaib'});assert.equal(login.status,200);const header=login.headers.get('set-cookie');assert.match(header,/HttpOnly/);assert.match(header,/Secure/);assert.match(header,/SameSite=Strict/);const cookie=header.split(';')[0];
+  const presentationRequest=(body,session='')=>fetch(base+'/api/presentation',{method:'POST',headers:{'Content-Type':'application/json',Cookie:session,Origin:base},body:JSON.stringify(body)});
+  assert.equal((await presentationRequest({revision:0,patch:{volume:.5}})).status,401);
+  assert.equal((await presentationRequest({revision:0,patch:{volume:2}},cookie)).status,400);
+  const settings=await presentationRequest({revision:0,patch:{volume:.5,sound:false,reduceMotion:true,test:true}},cookie);assert.equal(settings.status,200);const preferences=await settings.json();assert.ok(preferences.testId);assert.equal(preferences.volume,.5);
+  assert.equal((await presentationRequest({revision:0,patch:{sound:true}},cookie)).status,409);
+  const unchanged=await fetch(base+'/api/state').then(r=>r.json());assert.equal(unchanged.revision,0);assert.equal(unchanged.presentation.sound,false);assert.equal(unchanged.presentation.volume,.5);
+
   assert.equal((await fetch(base+'/api/session',{headers:{Cookie:cookie}}).then(r=>r.json())).authenticated,true);
   const enabled=await post({action:'enable',revision:0,numbers:Array.from({length:12},(_,i)=>i+1)},cookie);assert.equal(enabled.status,200);
   assert.equal((await post({action:'begin',revision:0},cookie)).status,409);

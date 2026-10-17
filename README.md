@@ -1,4 +1,4 @@
-# APAIB - 97° Aniversario · versión 3.0.2
+# APAIB - 97° Aniversario · versión 3.1.0
 
 Aplicación de sorteo web para un evento, con pantalla proyectada y controles en el celular. El alojamiento elegido es WNPower/cPanel: ver [WNPOWER.md](WNPOWER.md), incluidos los pasos para actualizar desde versiones anteriores. No hay dependencias externas que instalar. Requiere Node.js >=22; el panel del evento usa 24.21.0.
 
@@ -16,9 +16,9 @@ La pantalla está en `/` y el control en `/control`. Ingresar en el control la c
 
 ## Sonido y animación
 
-Sonido habilitado por defecto y botón Desactivar sonido. La preferencia elegida se recuerda en ese navegador. Por restricciones del navegador, hay que tocar o hacer clic una vez en la pantalla proyectada (por ejemplo al entrar en pantalla completa) para autorizar el audio. El aviso desaparece al habilitarse. No es necesario habilitar audio en el celular de control.
+Sonido habilitado por defecto y botón Desactivar sonido. La preferencia elegida se recuerda en ese navegador. Por restricciones del navegador, hay que tocar o hacer clic una vez en la pantalla proyectada (por ejemplo al entrar en pantalla completa) para autorizar el audio. El aviso desaparece al habilitarse. No es necesario habilitar audio en el celular de control. En el control móvil, Presentación y sonido reúne sonido, volumen (85% inicial, persistente), Probar sonido en la pantalla y reducción de movimiento. La prueba reproduce la fanfarria en la computadora proyectada, sin cambiar la partida ni sonar en el celular.
 
-Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. El cartel ganador, los papelitos y la fanfarria de metales comienzan juntos 1,5 segundos después de iniciarse el giro de las hojas. El botón Continuar sigue bloqueado hasta finalizar los 4,8 segundos del giro. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. La apertura lenta para proyección queda habilitada por defecto, incluso si el sistema reduce animaciones. El operador puede elegir explícitamente Reducir movimiento con el botón de la pantalla; la preferencia se recuerda. Los papelitos también se suprimen en ese modo.
+Las hojas de la fotografía giran hacia adentro durante 4,8 segundos, después de un breve intento de giro de la llave. No se vuelve a crear la escena cuando llega la confirmación de recepción. El cartel ganador, los papelitos y la fanfarria de metales comienzan juntos 1,5 segundos después de iniciarse el giro de las hojas. El botón Continuar sigue bloqueado hasta finalizar los 4,8 segundos del giro. El anuncio, su tamaño y los papelitos varían según el premio. Una recarga que recupera un resultado ya presentado lo reconstruye sin repetir la apertura. La apertura lenta para proyección queda habilitada por defecto, incluso si el sistema reduce animaciones. El operador puede elegir explícitamente Reducir movimiento desde el control móvil; la preferencia se recuerda. Los papelitos también se suprimen en ese modo.
 
 ## Guardado e integridad
 
@@ -46,3 +46,11 @@ La comprobación de navegador está en `scripts/verify-browser.cjs` (`npm run te
 En 3.0.1 se verificó también el caso de ocho llaves elegidas sin intentos finales, el giro lento con la preferencia de movimiento reducido del sistema activada y el inicio simultáneo del cartel y los osciladores de la fanfarria al comenzar la apertura.
 
 En 3.0.2 se verifica además que durante los primeros 900 ms de apertura no haya cartel ganador, fanfarria ni papelitos, y que el anuncio comience aproximadamente a los 1500 ms. El botón Continuar sigue esperando el final de la apertura, sin agregar otra espera al operador.
+
+En 3.1.0 el audio usa una salida compartida con más nivel y un compresor de picos. Intenta recuperar el contexto suspendido al volver a la ventana o reproducir un efecto. Si el navegador exige otro gesto, aparece Audio pausado y la indicación de tocar la pantalla. Se descartan efectos que ya llegaron tarde y se cancelan los pendientes al silenciar; no se acumulan para reproducirse todos juntos después. El volumen de Windows, la salida HDMI/altavoces elegida y la consola del salón siguen siendo ajustes externos: usar Probar sonido desde la computadora proyectada para verificarlos.
+
+Las pruebas de audio incluyen renderizado digital sin salida física (RMS y pico, comparados con el nivel anterior), suspensión real del contexto y recuperación en el siguiente premio, volumen persistente y prueba manual. Estas mediciones no sustituyen escuchar el equipo de sonido del salón.
+
+La pantalla proyectada queda sin barra de controles. Su único botón inicial es Iniciar presentación, para el gesto que exige el navegador al habilitar audio y pantalla completa; se oculta después. Si el navegador vuelve a bloquear audio, puede aparecer un aviso local para recuperarlo con un toque. El móvil muestra el último estado comunicado por la pantalla (audio listo, pausado o sin conexión reciente). Usar una única pestaña principal para proyectar; las pruebas remotas se ejecutan en las pantallas abiertas con esa URL.
+
+Las preferencias se guardan en DATA_DIR/presentation.json, con bloqueo y revisión propios: cambiar volumen, silenciar o hacer una prueba no modifica la revisión de la partida ni su sorteo. Reiniciar la partida conserva estas preferencias. Las solicitudes de prueba caducan y no se repiten al recargar una pantalla.
